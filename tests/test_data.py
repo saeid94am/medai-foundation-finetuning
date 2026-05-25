@@ -79,9 +79,9 @@ def test_dataset_image_shape(busi_root):
 
 def test_dataset_splits_are_disjoint(busi_root):
     common = dict(root=str(busi_root), image_size=64, seed=0)
-    train_paths = {s["path"] for s in BUSIDataset(**common, split="train").samples}
-    val_paths = {s["path"] for s in BUSIDataset(**common, split="val").samples}
-    test_paths = {s["path"] for s in BUSIDataset(**common, split="test").samples}
+    train_paths = {s["image"] for s in BUSIDataset(**common, split="train").samples}
+    val_paths = {s["image"] for s in BUSIDataset(**common, split="val").samples}
+    test_paths = {s["image"] for s in BUSIDataset(**common, split="test").samples}
     assert train_paths.isdisjoint(val_paths)
     assert train_paths.isdisjoint(test_paths)
     assert val_paths.isdisjoint(test_paths)
