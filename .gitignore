@@ -1,0 +1,85 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Data — never commit raw datasets
+data/
+*.nii
+*.nii.gz
+*.dcm
+*.mhd
+*.mha
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.tiff
+*.tif
+
+# Model checkpoints — store on HuggingFace Hub or DVC instead
+results/checkpoints/*.pth
+results/checkpoints/*.pt
+results/checkpoints/*.ckpt
+results/checkpoints/*.bin
+results/checkpoints/*.safetensors
+*.pth
+*.pt
+*.ckpt
+
+# Weights & Biases
+wandb/
+.wandb/
+
+# Hydra outputs
+outputs/
+multirun/
+.hydra/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Coverage / test artifacts
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Environment files with secrets
+.env
+.env.*
+secrets.yaml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker build cache
+.dockerignore
+docker/.env
+
+# MedSAM / SAM weights (large binary files)
+sam_vit_h_4b8939.pth
+medsam_vit_b.pth

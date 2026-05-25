@@ -1,0 +1,55 @@
+name: medai-medsam
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+  - pytorch=2.1.2
+  - torchvision=0.16.2
+  - pytorch-cuda=12.1
+  - cudatoolkit=12.1
+  - pip=23.3
+  - git
+  - pip:
+      # Foundation model & PEFT
+      - segment-anything==1.0
+      - peft==0.8.2
+      - transformers==4.37.2
+      - timm==0.9.16
+      # Medical imaging
+      - monai==1.3.0
+      - nibabel==5.2.0
+      - pydicom==2.4.4
+      - opencv-python==4.9.0.80
+      # Augmentation
+      - albumentations==1.3.1
+      # Config management
+      - hydra-core==1.3.2
+      - omegaconf==2.3.0
+      # Experiment tracking
+      - wandb==0.16.3
+      # Scientific computing
+      - numpy==1.26.3
+      - pandas==2.2.0
+      - scipy==1.12.0
+      - scikit-learn==1.4.0
+      - matplotlib==3.8.2
+      - pillow==10.2.0
+      - einops==0.7.0
+      - tqdm==4.66.1
+      # Demo
+      - streamlit==1.31.0
+      - gradio==4.16.0
+      # Dev tools
+      - pytest==7.4.4
+      - pytest-cov==4.1.0
+      - ruff==0.2.1
+      - black==24.1.1
+      - isort==5.13.2
+      - pre-commit==3.6.0
+      - nbstripout==0.7.1
+      # Install local package in editable mode
+      - -e .

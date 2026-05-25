@@ -1,0 +1,55 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it as below."
+type: software
+title: "MedSAM LoRA: Parameter-Efficient Fine-Tuning of MedSAM for Interactive Breast Lesion Segmentation"
+abstract: >
+  LoRA-based fine-tuning of MedSAM (Ma et al., Nature Communications 2024) on the BUSI breast
+  ultrasound dataset. Demonstrates that bounding-box-prompted segmentation with LoRA adapters
+  matches full fine-tuning at a fraction of the trainable parameters, and achieves label
+  efficiency superior to training UNet from scratch.
+authors:
+  - family-names: Amini
+    given-names: Saeid
+    email: saeed.amiinii@gmail.com
+    orcid: ""
+date-released: "2026-05-25"
+url: "https://github.com/saeid-amini/medai-foundation-finetuning"
+repository-code: "https://github.com/saeid-amini/medai-foundation-finetuning"
+license: MIT
+keywords:
+  - medical image segmentation
+  - foundation model
+  - LoRA
+  - MedSAM
+  - SAM
+  - breast ultrasound
+  - BUSI
+  - parameter-efficient fine-tuning
+
+references:
+  - type: article
+    title: "Segment anything in medical images"
+    authors:
+      - family-names: Ma
+        given-names: Jun
+      - family-names: He
+        given-names: Yuting
+      - family-names: Li
+        given-names: Feifei
+      - family-names: Han
+        given-names: Lin
+      - family-names: You
+        given-names: Chenyu
+      - family-names: Wang
+        given-names: Bo
+    journal: "Nature Communications"
+    year: 2024
+    volume: 15
+    doi: "10.1038/s41467-024-44824-z"
+  - type: article
+    title: "LoRA: Low-Rank Adaptation of Large Language Models"
+    authors:
+      - family-names: Hu
+        given-names: Edward J.
+    journal: "ICLR 2022"
+    year: 2022

@@ -1,0 +1,99 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "medai-medsam"
+version = "0.1.0"
+description = "LoRA fine-tuning of MedSAM for interactive breast lesion segmentation on BUSI"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Saeid Amini", email = "saeed.amiinii@gmail.com" }]
+requires-python = ">=3.10"
+keywords = ["medical imaging", "segmentation", "foundation model", "LoRA", "MedSAM", "SAM", "BUSI"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+
+dependencies = [
+    # Deep learning core
+    "torch==2.1.2",
+    "torchvision==0.16.2",
+    # Foundation model & PEFT
+    "segment-anything==1.0",
+    "peft==0.8.2",
+    "transformers==4.37.2",
+    "timm==0.9.16",
+    # Medical imaging
+    "monai==1.3.0",
+    "nibabel==5.2.0",
+    "pydicom==2.4.4",
+    "opencv-python==4.9.0.80",
+    # Augmentation
+    "albumentations==1.3.1",
+    # Config management
+    "hydra-core==1.3.2",
+    "omegaconf==2.3.0",
+    # Experiment tracking
+    "wandb==0.16.3",
+    # Scientific computing
+    "numpy==1.26.3",
+    "pandas==2.2.0",
+    "scipy==1.12.0",
+    "scikit-learn==1.4.0",
+    "matplotlib==3.8.2",
+    "pillow==10.2.0",
+    "einops==0.7.0",
+    "tqdm==4.66.1",
+    # Demo
+    "streamlit==1.31.0",
+    "gradio==4.16.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==7.4.4",
+    "pytest-cov==4.1.0",
+    "ruff==0.2.1",
+    "black==24.1.1",
+    "isort==5.13.2",
+    "pre-commit==3.6.0",
+    "nbstripout==0.7.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/saeid-amini/medai-foundation-finetuning"
+Repository = "https://github.com/saeid-amini/medai-foundation-finetuning"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/medai_medsam"]
+
+# ── Ruff ──────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["S101"]
+
+# ── Black ─────────────────────────────────────────────────────────────────────
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+# ── isort ─────────────────────────────────────────────────────────────────────
+[tool.isort]
+profile = "black"
+line_length = 100
+
+# ── pytest ────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=src/medai_medsam --cov-report=term-missing --cov-fail-under=80"
