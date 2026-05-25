@@ -58,7 +58,7 @@ def test_val_transforms_is_none():
 
 def test_dataset_length(busi_root):
     ds = BUSIDataset(root=str(busi_root), split="train", image_size=64, seed=0)
-    # 3 images × 2 classes = 6 total; 80% train = 4 or 5 samples
+    # 10 images × 2 classes = 20 total; 80% train = 16 samples
     assert len(ds) > 0
 
 
