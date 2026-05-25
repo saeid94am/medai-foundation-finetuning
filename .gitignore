@@ -16,8 +16,8 @@ venv/
 env/
 ENV/
 
-# Data — never commit raw datasets
-data/
+# Data — never commit raw datasets (anchored to repo root to avoid matching src/medai_medsam/data/)
+/data/
 *.nii
 *.nii.gz
 *.dcm
