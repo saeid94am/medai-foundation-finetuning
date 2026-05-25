@@ -13,8 +13,8 @@ authors:
     email: saeed.amiinii@gmail.com
     orcid: ""
 date-released: "2026-05-25"
-url: "https://github.com/saeid-amini/medai-foundation-finetuning"
-repository-code: "https://github.com/saeid-amini/medai-foundation-finetuning"
+url: "https://github.com/saeid94am/medai-foundation-finetuning"
+repository-code: "https://github.com/saeid94am/medai-foundation-finetuning"
 license: MIT
 keywords:
   - medical image segmentation

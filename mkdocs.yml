@@ -1,7 +1,7 @@
 site_name: MedSAM LoRA — BUSI Segmentation
 site_description: Parameter-efficient fine-tuning of MedSAM for interactive breast lesion segmentation
 site_author: Saeid Amini
-repo_url: https://github.com/saeid-amini/medai-foundation-finetuning
+repo_url: https://github.com/saeid94am/medai-foundation-finetuning
 repo_name: medai-foundation-finetuning
 
 theme:

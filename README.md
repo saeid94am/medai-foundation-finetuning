@@ -2,9 +2,9 @@
 
 > LoRA-adapted MedSAM achieves **Dice = TBD** on the BUSI test set, outperforming a UNet trained from scratch (Dice = TBD) while using **<1% trainable parameters** and requiring **10× fewer annotated samples** to surpass the UNet baseline.
 
-[![CI — Lint](https://github.com/saeid-amini/medai-foundation-finetuning/actions/workflows/lint.yml/badge.svg)](https://github.com/saeid-amini/medai-foundation-finetuning/actions/workflows/lint.yml)
-[![CI — Tests](https://github.com/saeid-amini/medai-foundation-finetuning/actions/workflows/test.yml/badge.svg)](https://github.com/saeid-amini/medai-foundation-finetuning/actions/workflows/test.yml)
-[![CI — Docker](https://github.com/saeid-amini/medai-foundation-finetuning/actions/workflows/docker-build.yml/badge.svg)](https://github.com/saeid-amini/medai-foundation-finetuning/actions/workflows/docker-build.yml)
+[![CI — Lint](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/lint.yml/badge.svg)](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/lint.yml)
+[![CI — Tests](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/test.yml/badge.svg)](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/test.yml)
+[![CI — Docker](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/docker-build.yml/badge.svg)](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/docker-build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
@@ -69,9 +69,9 @@ All experiments: BUSI dataset, stratified 80 / 10 / 10 split, 3 random seeds, me
 
 ```bash
 # 1. Pull and run the Docker image
-docker pull ghcr.io/saeid-amini/medai-foundation-finetuning:latest
+docker pull ghcr.io/saeid94am/medai-foundation-finetuning:latest
 docker run --gpus all -v $(pwd)/data:/workspace/data \
-           ghcr.io/saeid-amini/medai-foundation-finetuning:latest \
+           ghcr.io/saeid94am/medai-foundation-finetuning:latest \
            bash scripts/run_experiments.sh
 
 # 2. Or run locally after setting up the environment
@@ -79,8 +79,8 @@ conda env create -f environment.yml && conda activate medai-medsam
 pip install -e .
 
 # 3. Train and evaluate
-python -m medai_medsam.train experiment=lora_r8
-python -m medai_medsam.eval  checkpoint=results/checkpoints/lora_r8_best.pth
+python -m medai_medsam.train model=medsam_lora
+python -m medai_medsam.eval  checkpoint=results/checkpoints/medsam_lora_best.pth
 ```
 
 ---
@@ -120,7 +120,7 @@ If you use this code in your research, please cite:
   author    = {Amini, Saeid},
   title     = {MedSAM LoRA: Parameter-Efficient Fine-Tuning of MedSAM for Interactive Breast Lesion Segmentation},
   year      = {2026},
-  url       = {https://github.com/saeid-amini/medai-foundation-finetuning},
+  url       = {https://github.com/saeid94am/medai-foundation-finetuning},
   license   = {MIT}
 }
 

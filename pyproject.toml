@@ -67,8 +67,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/saeid-amini/medai-foundation-finetuning"
-Repository = "https://github.com/saeid-amini/medai-foundation-finetuning"
+Homepage = "https://github.com/saeid94am/medai-foundation-finetuning"
+Repository = "https://github.com/saeid94am/medai-foundation-finetuning"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/medai_medsam"]

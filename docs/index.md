@@ -22,6 +22,6 @@ retaining the interactive, bounding-box-prompted workflow required in clinical p
 
 ## Quick links
 
-- [GitHub repository](https://github.com/saeid-amini/medai-foundation-finetuning)
+- [GitHub repository](https://github.com/saeid94am/medai-foundation-finetuning)
 - [W&B experiment report](#) *(link added after training)*
 - [Quickstart guide](quickstart.md)
