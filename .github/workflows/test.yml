@@ -26,6 +26,20 @@ jobs:
       - name: Install package and dev dependencies
         run: pip install -e ".[dev]"
 
+      - name: Smoke-test data package import
+        run: |
+          python - <<'EOF'
+          import traceback, sys
+          try:
+              import medai_medsam.data
+              from medai_medsam.data.dataset import BUSIDataset
+              from medai_medsam.data.transforms import get_train_transforms
+              print("data package imports OK")
+          except Exception:
+              traceback.print_exc()
+              sys.exit(1)
+          EOF
+
       - name: Run pytest
         run: pytest tests/ -v --cov=src/medai_medsam --cov-report=xml --cov-fail-under=70
 
