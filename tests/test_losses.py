@@ -37,3 +37,26 @@ def test_loss_weights_sum_effect():
     combined = DiceBCELoss(dice_weight=0.5, bce_weight=0.5)(logits, mask)
 
     assert abs(combined.item() - 0.5 * (dice_only.item() + bce_only.item())) < 1e-5
+
+
+def test_build_loss_factory_returns_criterion():
+    from omegaconf import OmegaConf
+
+    from medai_medsam.losses import build_loss
+
+    cfg = OmegaConf.create(
+        {"loss": {"name": "dice_bce", "dice_weight": 0.5, "bce_weight": 0.5, "smooth": 1e-5}}
+    )
+    criterion = build_loss(cfg)
+    assert isinstance(criterion, DiceBCELoss)
+
+
+def test_build_loss_unknown_raises():
+    import pytest
+    from omegaconf import OmegaConf
+
+    from medai_medsam.losses import build_loss
+
+    cfg = OmegaConf.create({"loss": {"name": "unknown_loss"}})
+    with pytest.raises(ValueError, match="Unknown loss"):
+        build_loss(cfg)

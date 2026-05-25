@@ -85,3 +85,36 @@ def test_dataset_splits_are_disjoint(busi_root):
     assert train_paths.isdisjoint(val_paths)
     assert train_paths.isdisjoint(test_paths)
     assert val_paths.isdisjoint(test_paths)
+
+
+def test_build_dataloaders_returns_two_loaders(busi_root):
+    from omegaconf import OmegaConf
+
+    from medai_medsam.data.utils import build_dataloaders
+
+    cfg = OmegaConf.create(
+        {
+            "seed": 0,
+            "data": {
+                "root": str(busi_root),
+                "image_size": 64,
+                "classes": ["benign", "malignant"],
+                "train_split": 0.8,
+                "val_split": 0.1,
+                "batch_size": 2,
+                "num_workers": 0,
+                "pin_memory": False,
+                "bbox_noise_px": 0,
+                "augmentation": {
+                    "horizontal_flip_prob": 0.5,
+                    "vertical_flip_prob": 0.0,
+                    "rotate_limit": 10,
+                    "brightness_contrast_prob": 0.2,
+                    "gaussian_noise_prob": 0.1,
+                },
+            },
+        }
+    )
+    train_loader, val_loader = build_dataloaders(cfg)
+    assert len(train_loader.dataset) > 0
+    assert len(val_loader.dataset) > 0
