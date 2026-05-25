@@ -19,7 +19,7 @@ WORKDIR /workspace
 
 # Copy dependency specs before source code to maximise layer cache reuse.
 # A change to src/ will not invalidate the pip install layer.
-COPY pyproject.toml README.md ./
+COPY pyproject.toml README.md LICENSE ./
 
 # Install all dependencies including the local package in editable mode.
 # torch/torchvision are already in the base image; pip will skip them.
