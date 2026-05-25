@@ -1,5 +1,4 @@
 import torch
-import pytest
 
 from medai_medsam.metrics.segmentation import SegmentationMetrics
 

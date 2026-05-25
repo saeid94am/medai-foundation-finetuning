@@ -1,6 +1,5 @@
-from omegaconf import DictConfig
-
 import torch
+from omegaconf import DictConfig
 
 
 def bbox_to_sam_format(bbox: torch.Tensor, device: torch.device) -> torch.Tensor:

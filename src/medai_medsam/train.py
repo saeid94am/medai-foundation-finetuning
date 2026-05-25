@@ -9,12 +9,11 @@ Run with:
 import random
 from pathlib import Path
 
+import hydra
 import numpy as np
 import torch
 import wandb
 from omegaconf import DictConfig, OmegaConf
-
-import hydra
 
 from medai_medsam.data import build_dataloaders
 from medai_medsam.losses import build_loss

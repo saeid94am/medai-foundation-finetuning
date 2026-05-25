@@ -1,5 +1,3 @@
-from typing import Dict
-
 import torch
 from monai.metrics import DiceMetric, HausdorffDistanceMetric
 
@@ -21,8 +19,8 @@ class SegmentationMetrics:
         metrics.reset()
     """
 
-    def __init__(self, device: torch.device = torch.device("cpu")) -> None:
-        self.device = device
+    def __init__(self, device: torch.device | None = None) -> None:
+        self.device = device or torch.device("cpu")
         self._dice = DiceMetric(include_background=False, reduction="mean")
         self._hd95 = HausdorffDistanceMetric(include_background=False, percentile=95, reduction="mean")
         self._iou_sum = 0.0
@@ -52,7 +50,7 @@ class SegmentationMetrics:
             self._iou_sum += (intersection[valid] / union[valid]).sum().item()
             self._count += valid.sum().item()
 
-    def compute(self) -> Dict[str, float]:
+    def compute(self) -> dict[str, float]:
         dice = self._dice.aggregate().item()
         hd95_agg = self._hd95.aggregate()
         hd95 = hd95_agg.item() if hd95_agg is not None else float("nan")

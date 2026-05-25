@@ -1,5 +1,3 @@
-from typing import List
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -38,10 +36,12 @@ class UNet(nn.Module):
         self,
         in_channels: int = 1,
         out_channels: int = 1,
-        features: List[int] = [64, 128, 256, 512],
+        features: list[int] | None = None,
         bilinear: bool = False,
     ) -> None:
         super().__init__()
+        if features is None:
+            features = [64, 128, 256, 512]
         self.pool = nn.MaxPool2d(2, 2)
 
         self.encoder = nn.ModuleList()
@@ -70,7 +70,7 @@ class UNet(nn.Module):
         x = self.bottleneck(x)
 
         for up, conv, skip in zip(
-            self.decoder_up, self.decoder_conv, reversed(skip_connections)
+            self.decoder_up, self.decoder_conv, reversed(skip_connections), strict=True
         ):
             x = up(x)
             if x.shape != skip.shape:

@@ -1,5 +1,4 @@
 import torch
-import pytest
 
 from medai_medsam.losses.dice_bce import DiceBCELoss
 

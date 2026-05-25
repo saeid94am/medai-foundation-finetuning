@@ -1,8 +1,8 @@
 import pytest
 import torch
 
-from medai_medsam.models.unet import UNet
 from medai_medsam.models.prompt_utils import bbox_to_sam_format, build_model
+from medai_medsam.models.unet import UNet
 
 
 # ── UNet ─────────────────────────────────────────────────────────────────────

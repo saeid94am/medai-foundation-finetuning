@@ -7,10 +7,9 @@ Run with:
 import csv
 from pathlib import Path
 
+import hydra
 import torch
 from omegaconf import DictConfig, OmegaConf
-
-import hydra
 
 from medai_medsam.data.dataset import BUSIDataset
 from medai_medsam.data.transforms import get_val_transforms

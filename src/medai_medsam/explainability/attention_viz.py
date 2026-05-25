@@ -1,5 +1,3 @@
-from typing import Dict, List, Optional
-
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -30,8 +28,8 @@ class AttentionVisualizer:
     def __init__(self, decoder: nn.Module, layer_idx: int = -1) -> None:
         self.decoder = decoder
         self.layer_idx = layer_idx
-        self._hooks: List = []
-        self._attn_weights: Optional[torch.Tensor] = None
+        self._hooks: list = []
+        self._attn_weights: torch.Tensor | None = None
 
     # ------------------------------------------------------------------
     def __enter__(self):
@@ -52,7 +50,7 @@ class AttentionVisualizer:
         if target_layer is not None:
             self._hooks.append(target_layer.register_forward_hook(_hook))
 
-    def _get_target_layer(self) -> Optional[nn.Module]:
+    def _get_target_layer(self) -> nn.Module | None:
         # Navigate: decoder → transformer → layers[idx] → cross_attn_token_to_image
         try:
             layers = self.decoder.transformer.layers
@@ -67,7 +65,7 @@ class AttentionVisualizer:
         self._hooks.clear()
 
     # ------------------------------------------------------------------
-    def get_heatmap(self, spatial_size: int = 1024) -> Optional[np.ndarray]:
+    def get_heatmap(self, spatial_size: int = 1024) -> np.ndarray | None:
         """Return a ``[spatial_size, spatial_size]`` attention heatmap.
 
         Averages attention weights across heads and mask tokens, then
