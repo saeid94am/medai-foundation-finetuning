@@ -1,0 +1,15 @@
+# MedSAM full fine-tune: all parameters are trainable.
+# Upper-bound reference. Requires ≥10 GB VRAM (run on Kaggle / Colab).
+# Use a lower LR for the image encoder to reduce catastrophic forgetting.
+name: medsam_full_finetune
+checkpoint: checkpoints/medsam_vit_b.pth
+
+freeze_image_encoder: false
+freeze_prompt_encoder: false
+
+layer_wise_lr_decay:
+  enabled: true
+  decay_rate: 0.75            # each encoder block gets LR × 0.75 relative to the one above
+
+prompt:
+  type: bbox

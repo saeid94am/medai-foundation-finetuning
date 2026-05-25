@@ -1,0 +1,21 @@
+# MedSAM with LoRA adapters injected into the mask decoder's Q and V projections.
+# Image encoder and prompt encoder are fully frozen.
+# Only LoRA matrices (A, B) and the final mask head are trainable.
+name: medsam_lora
+checkpoint: checkpoints/medsam_vit_b.pth
+
+freeze_image_encoder: true
+freeze_prompt_encoder: true
+
+lora:
+  r: 8                        # rank — controls capacity vs. parameter count
+  lora_alpha: 16              # scaling factor: effective scale = alpha / r = 2.0
+  target_modules:             # inject into Q and V projections of mask decoder attention
+    - q_proj
+    - v_proj
+  lora_dropout: 0.1
+  bias: none                  # do not add trainable bias terms
+
+prompt:
+  type: bbox                  # bounding-box prompt; auto-derived from GT mask at train time
+  # At inference: provide box as [x_min, y_min, x_max, y_max] in 1024-px space

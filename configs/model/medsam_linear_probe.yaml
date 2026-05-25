@@ -1,0 +1,12 @@
+# MedSAM linear probe: every layer frozen except the final output projection.
+# Fastest to train; establishes the lower bound of fine-tuning performance.
+name: medsam_linear_probe
+checkpoint: checkpoints/medsam_vit_b.pth
+
+freeze_image_encoder: true
+freeze_prompt_encoder: true
+freeze_mask_decoder: true     # freeze all decoder weights...
+unfreeze_output_head: true    # ...except the final 2-layer MLP output projection
+
+prompt:
+  type: bbox

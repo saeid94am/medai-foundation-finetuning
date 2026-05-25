@@ -1,0 +1,20 @@
+# UNet trained from scratch on BUSI — the "no foundation model" baseline.
+# Same data splits and augmentation as MedSAM experiments for fair comparison.
+name: unet_baseline
+
+architecture:
+  in_channels: 1             # breast ultrasound is grayscale
+  out_channels: 1            # binary lesion mask
+  features: [64, 128, 256, 512]
+  bilinear: false            # use transposed convolutions for upsampling
+
+# UNet takes 256×256 input (not 1024); override the global image_size
+data:
+  image_size: 256
+
+# UNet trains faster — bump LR and reduce warmup
+optimizer:
+  lr: 1.0e-3
+
+scheduler:
+  warmup_epochs: 3

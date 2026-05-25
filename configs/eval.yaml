@@ -1,0 +1,32 @@
+# @package _global_
+# Evaluation config. Run with:
+#   python -m medai_medsam.eval checkpoint=results/checkpoints/<name>.pth
+
+checkpoint: results/checkpoints/best.pth
+
+data:
+  root: data/BUSI
+  image_size: 1024
+  split: test              # always evaluate on the held-out test split
+  batch_size: 1            # batch=1 for per-case metric logging
+  num_workers: 4
+  classes: [benign, malignant]
+  bbox_noise_px: 0         # no perturbation at eval time
+
+metrics:
+  - dice                   # primary metric
+  - hd95                   # 95th-percentile Hausdorff distance
+  - iou                    # Intersection over Union
+  per_class: true          # report metrics separately for benign / malignant
+
+output:
+  dir: results/metrics
+  predictions_dir: results/figures/predictions
+  save_predictions: true   # save overlay PNGs for qualitative inspection
+  results_csv: results/metrics/test_results.csv
+  wandb_run_file: results/metrics/wandb_runs.txt
+
+# Label-efficiency sweep: set to evaluate a checkpoint trained on N% of data
+label_efficiency:
+  enabled: false
+  fractions: [0.1, 0.2, 0.5, 1.0]

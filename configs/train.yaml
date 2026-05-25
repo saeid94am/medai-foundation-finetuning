@@ -1,0 +1,76 @@
+# @package _global_
+# Top-level training config. Override any field with:
+#   python -m medai_medsam.train model=unet_baseline training.max_epochs=50
+defaults:
+  - model: medsam_lora   # swap to: medsam_linear_probe | medsam_full_finetune | unet_baseline
+  - _self_
+
+seed: 42
+
+data:
+  root: data/BUSI
+  image_size: 1024          # MedSAM requires 1024×1024 input
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  batch_size: 2             # effective batch = 8 via gradient accumulation below
+  num_workers: 4
+  pin_memory: true
+  classes: [benign, malignant]   # "normal" class excluded (no lesion present)
+  # Augmentation applied only to train split
+  augmentation:
+    horizontal_flip_prob: 0.5
+    vertical_flip_prob: 0.3
+    rotate_limit: 15
+    brightness_contrast_prob: 0.3
+    gaussian_noise_prob: 0.2
+  # Bounding-box prompt perturbation during training (pixels)
+  bbox_noise_px: 5
+
+training:
+  max_epochs: 100
+  early_stopping_patience: 15
+  gradient_clip_val: 1.0
+  accumulate_grad_batches: 4    # effective batch size = batch_size × accumulate_grad_batches
+  mixed_precision: true
+  gradient_checkpointing: true  # required for 4 GB VRAM; small speed cost
+
+optimizer:
+  name: adamw
+  lr: 1.0e-4
+  weight_decay: 1.0e-5
+  betas: [0.9, 0.999]
+
+scheduler:
+  name: cosine_annealing
+  T_max: ${training.max_epochs}
+  eta_min: 1.0e-6
+  warmup_epochs: 5
+
+loss:
+  name: dice_bce
+  dice_weight: 0.5
+  bce_weight: 0.5
+  smooth: 1.0e-5
+
+checkpointing:
+  dirpath: results/checkpoints
+  monitor: val/dice
+  mode: max
+  save_top_k: 3
+  filename: "${model.name}_seed${seed}_{epoch:03d}_{val/dice:.4f}"
+
+logging:
+  wandb:
+    project: medai-medsam
+    entity: null           # set to your W&B username or team
+    tags: [medsam, lora, busi]
+    log_interval: 10       # log every N batches
+    log_images: true       # log sample predictions to W&B
+
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
