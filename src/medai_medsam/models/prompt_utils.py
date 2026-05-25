@@ -49,4 +49,6 @@ def build_model(cfg: DictConfig) -> torch.nn.Module:
     if name in {"medsam_lora", "medsam_linear_probe", "medsam_full_finetune"}:
         return MedSAMLoRA(checkpoint=cfg.model.checkpoint, cfg=cfg.model)
 
-    raise ValueError(f"Unknown model name '{name}'. Expected one of: medsam_lora, medsam_linear_probe, medsam_full_finetune, unet_baseline.")
+    raise ValueError(
+        f"Unknown model name '{name}'. Expected one of: medsam_lora, medsam_linear_probe, medsam_full_finetune, unet_baseline."
+    )

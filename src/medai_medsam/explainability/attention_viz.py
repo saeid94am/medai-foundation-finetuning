@@ -77,8 +77,8 @@ class AttentionVisualizer:
             return None
 
         # attn_weights: [B, heads, n_tokens, n_patches]
-        attn = self._attn_weights[0]          # first batch item
-        attn = attn.mean(dim=0).mean(dim=0)   # average over heads and tokens → [n_patches]
+        attn = self._attn_weights[0]  # first batch item
+        attn = attn.mean(dim=0).mean(dim=0)  # average over heads and tokens → [n_patches]
 
         grid_size = int(attn.shape[0] ** 0.5)
         heatmap = attn.reshape(grid_size, grid_size).numpy()

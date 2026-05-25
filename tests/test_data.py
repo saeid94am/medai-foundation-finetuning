@@ -6,6 +6,7 @@ from medai_medsam.data.utils import mask_to_bbox
 
 # ── mask_to_bbox ──────────────────────────────────────────────────────────────
 
+
 def test_mask_to_bbox_basic():
     mask = np.zeros((100, 100), dtype=np.uint8)
     mask[20:60, 30:70] = 1
@@ -31,15 +32,19 @@ def test_mask_to_bbox_noise_stays_in_bounds():
 
 # ── transforms ───────────────────────────────────────────────────────────────
 
+
 def test_train_transforms_not_none():
     from omegaconf import OmegaConf
-    aug_cfg = OmegaConf.create({
-        "horizontal_flip_prob": 0.5,
-        "vertical_flip_prob": 0.3,
-        "rotate_limit": 15,
-        "brightness_contrast_prob": 0.3,
-        "gaussian_noise_prob": 0.2,
-    })
+
+    aug_cfg = OmegaConf.create(
+        {
+            "horizontal_flip_prob": 0.5,
+            "vertical_flip_prob": 0.3,
+            "rotate_limit": 15,
+            "brightness_contrast_prob": 0.3,
+            "gaussian_noise_prob": 0.2,
+        }
+    )
     t = get_train_transforms(aug_cfg)
     assert t is not None
 
@@ -49,6 +54,7 @@ def test_val_transforms_is_none():
 
 
 # ── BUSIDataset ───────────────────────────────────────────────────────────────
+
 
 def test_dataset_length(busi_root):
     ds = BUSIDataset(root=str(busi_root), split="train", image_size=64, seed=0)
@@ -74,8 +80,8 @@ def test_dataset_image_shape(busi_root):
 def test_dataset_splits_are_disjoint(busi_root):
     common = dict(root=str(busi_root), image_size=64, seed=0)
     train_paths = {s["path"] for s in BUSIDataset(**common, split="train").samples}
-    val_paths   = {s["path"] for s in BUSIDataset(**common, split="val").samples}
-    test_paths  = {s["path"] for s in BUSIDataset(**common, split="test").samples}
+    val_paths = {s["path"] for s in BUSIDataset(**common, split="val").samples}
+    test_paths = {s["path"] for s in BUSIDataset(**common, split="test").samples}
     assert train_paths.isdisjoint(val_paths)
     assert train_paths.isdisjoint(test_paths)
     assert val_paths.isdisjoint(test_paths)

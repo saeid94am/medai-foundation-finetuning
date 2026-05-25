@@ -40,9 +40,13 @@ def build_optimizer(cfg: DictConfig, model: torch.nn.Module) -> torch.optim.Opti
 
 def build_scheduler(cfg: DictConfig, optimizer: torch.optim.Optimizer):
     s = cfg.scheduler
-    warmup = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, total_iters=s.warmup_epochs)
+    warmup = torch.optim.lr_scheduler.LinearLR(
+        optimizer, start_factor=0.1, total_iters=s.warmup_epochs
+    )
     cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=s.T_max, eta_min=s.eta_min)
-    return torch.optim.lr_scheduler.SequentialLR(optimizer, [warmup, cosine], milestones=[s.warmup_epochs])
+    return torch.optim.lr_scheduler.SequentialLR(
+        optimizer, [warmup, cosine], milestones=[s.warmup_epochs]
+    )
 
 
 def train_one_epoch(model, loader, optimizer, criterion, scaler, cfg, device, epoch):
@@ -132,7 +136,9 @@ def main(cfg: DictConfig) -> None:
     patience_counter = 0
 
     for epoch in range(cfg.training.max_epochs):
-        train_loss = train_one_epoch(model, train_loader, optimizer, criterion, scaler, cfg, device, epoch)
+        train_loss = train_one_epoch(
+            model, train_loader, optimizer, criterion, scaler, cfg, device, epoch
+        )
         val_results = validate(model, val_loader, criterion, val_metrics, device, cfg)
         scheduler.step()
 

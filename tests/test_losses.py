@@ -33,7 +33,7 @@ def test_loss_weights_sum_effect():
     logits = torch.zeros_like(mask)
 
     dice_only = DiceBCELoss(dice_weight=1.0, bce_weight=0.0)(logits, mask)
-    bce_only  = DiceBCELoss(dice_weight=0.0, bce_weight=1.0)(logits, mask)
-    combined  = DiceBCELoss(dice_weight=0.5, bce_weight=0.5)(logits, mask)
+    bce_only = DiceBCELoss(dice_weight=0.0, bce_weight=1.0)(logits, mask)
+    combined = DiceBCELoss(dice_weight=0.5, bce_weight=0.5)(logits, mask)
 
     assert abs(combined.item() - 0.5 * (dice_only.item() + bce_only.item())) < 1e-5

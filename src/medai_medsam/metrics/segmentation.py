@@ -22,7 +22,9 @@ class SegmentationMetrics:
     def __init__(self, device: torch.device | None = None) -> None:
         self.device = device or torch.device("cpu")
         self._dice = DiceMetric(include_background=False, reduction="mean")
-        self._hd95 = HausdorffDistanceMetric(include_background=False, percentile=95, reduction="mean")
+        self._hd95 = HausdorffDistanceMetric(
+            include_background=False, percentile=95, reduction="mean"
+        )
         self._iou_sum = 0.0
         self._count = 0
 

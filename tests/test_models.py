@@ -6,6 +6,7 @@ from medai_medsam.models.unet import UNet
 
 # ── UNet ─────────────────────────────────────────────────────────────────────
 
+
 def test_unet_output_shape():
     model = UNet(in_channels=1, out_channels=1, features=[16, 32])
     x = torch.randn(2, 1, 256, 256)
@@ -30,6 +31,7 @@ def test_unet_output_is_logits_not_probabilities():
 
 # ── prompt_utils ─────────────────────────────────────────────────────────────
 
+
 def test_bbox_to_sam_format_shape():
     bbox = torch.tensor([10.0, 20.0, 100.0, 150.0])
     result = bbox_to_sam_format(bbox, torch.device("cpu"))
@@ -44,26 +46,31 @@ def test_bbox_to_sam_format_values_preserved():
 
 # ── build_model factory ───────────────────────────────────────────────────────
 
+
 def test_build_model_unet(tmp_path):
     from omegaconf import OmegaConf
-    cfg = OmegaConf.create({
-        "seed": 42,
-        "model": {
-            "name": "unet_baseline",
-            "architecture": {
-                "in_channels": 1,
-                "out_channels": 1,
-                "features": [8, 16],
-                "bilinear": False,
+
+    cfg = OmegaConf.create(
+        {
+            "seed": 42,
+            "model": {
+                "name": "unet_baseline",
+                "architecture": {
+                    "in_channels": 1,
+                    "out_channels": 1,
+                    "features": [8, 16],
+                    "bilinear": False,
+                },
             },
-        },
-    })
+        }
+    )
     model = build_model(cfg)
     assert isinstance(model, UNet)
 
 
 def test_build_model_unknown_name_raises():
     from omegaconf import OmegaConf
+
     cfg = OmegaConf.create({"model": {"name": "nonexistent_model"}})
     with pytest.raises(ValueError, match="Unknown model name"):
         build_model(cfg)

@@ -105,7 +105,9 @@ class MedSAMLoRA(nn.Module):
 
         # Upsample to 1024×1024 to match GT mask resolution
         low_res = torch.cat(pred_masks, dim=0)  # [B, 1, 256, 256]
-        return F.interpolate(low_res, size=(self.img_size, self.img_size), mode="bilinear", align_corners=False)
+        return F.interpolate(
+            low_res, size=(self.img_size, self.img_size), mode="bilinear", align_corners=False
+        )
 
     # ------------------------------------------------------------------
     def trainable_parameter_count(self) -> int:
