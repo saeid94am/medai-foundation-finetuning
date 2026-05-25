@@ -4,7 +4,6 @@ from medai_medsam.data.dataset import BUSIDataset
 from medai_medsam.data.transforms import get_train_transforms, get_val_transforms
 from medai_medsam.data.utils import mask_to_bbox
 
-
 # ── mask_to_bbox ──────────────────────────────────────────────────────────────
 
 def test_mask_to_bbox_basic():
