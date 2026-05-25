@@ -1,5 +1,4 @@
 import numpy as np
-import torch
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 

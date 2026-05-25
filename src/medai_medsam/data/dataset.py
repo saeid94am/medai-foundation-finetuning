@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import cv2
 import numpy as np
@@ -44,7 +43,7 @@ class BUSIDataset(Dataset):
         root: str,
         split: str = "train",
         image_size: int = 1024,
-        classes: Optional[List[str]] = None,
+        classes: list[str] | None = None,
         transform=None,
         bbox_noise_px: int = 0,
         train_split: float = 0.8,
@@ -62,7 +61,7 @@ class BUSIDataset(Dataset):
         self.samples = self._stratified_split(all_samples, split, train_split, val_split, seed)
 
     # ------------------------------------------------------------------
-    def _build_sample_list(self) -> List[Dict]:
+    def _build_sample_list(self) -> list[dict]:
         samples = []
         for label_idx, cls in enumerate(self.classes):
             cls_dir = self.root / cls
@@ -85,12 +84,12 @@ class BUSIDataset(Dataset):
 
     def _stratified_split(
         self,
-        samples: List[Dict],
+        samples: list[dict],
         split: str,
         train_frac: float,
         val_frac: float,
         seed: int,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         labels = [s["label"] for s in samples]
         test_frac = 1.0 - train_frac - val_frac
         train_val, test = train_test_split(
@@ -109,7 +108,7 @@ class BUSIDataset(Dataset):
     def __len__(self) -> int:
         return len(self.samples)
 
-    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         sample = self.samples[idx]
 
         image = cv2.imread(str(sample["image"]), cv2.IMREAD_GRAYSCALE)
