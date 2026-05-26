@@ -34,6 +34,7 @@ training:
   accumulate_grad_batches: 4    # effective batch size = batch_size × accumulate_grad_batches
   mixed_precision: true
   gradient_checkpointing: true  # required for 4 GB VRAM; small speed cost
+  resume_from: null             # path to checkpoint to resume from, e.g. results/checkpoints/medsam_lora_last.pth
 
 optimizer:
   name: adamw

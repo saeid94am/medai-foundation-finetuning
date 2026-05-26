@@ -4,6 +4,7 @@ Run with:
     python -m medai_medsam.train
     python -m medai_medsam.train model=unet_baseline
     python -m medai_medsam.train training.max_epochs=50 seed=0,1,2 --multirun
+    python -m medai_medsam.train training.resume_from=results/checkpoints/medsam_lora_last.pth
 """
 
 import random
@@ -134,8 +135,22 @@ def main(cfg: DictConfig) -> None:
 
     best_dice = 0.0
     patience_counter = 0
+    start_epoch = 0
 
-    for epoch in range(cfg.training.max_epochs):
+    if cfg.training.resume_from:
+        ckpt = torch.load(cfg.training.resume_from, map_location=device)
+        model.load_state_dict(ckpt["model_state_dict"])
+        optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+        scheduler.load_state_dict(ckpt["scheduler_state_dict"])
+        scaler.load_state_dict(ckpt["scaler_state_dict"])
+        best_dice = ckpt["best_dice"]
+        patience_counter = ckpt["patience_counter"]
+        start_epoch = ckpt["epoch"] + 1
+        print(
+            f"Resumed from '{cfg.training.resume_from}' (epoch {ckpt['epoch']}). Best val Dice so far: {best_dice:.4f}"
+        )
+
+    for epoch in range(start_epoch, cfg.training.max_epochs):
         train_loss = train_one_epoch(
             model, train_loader, optimizer, criterion, scaler, cfg, device, epoch
         )
@@ -156,7 +171,6 @@ def main(cfg: DictConfig) -> None:
         if val_results["dice"] > best_dice:
             best_dice = val_results["dice"]
             patience_counter = 0
-            ckpt_path = ckpt_dir / f"{cfg.model.name}_best.pth"
             torch.save(
                 {
                     "epoch": epoch,
@@ -165,10 +179,26 @@ def main(cfg: DictConfig) -> None:
                     "val_dice": best_dice,
                     "cfg": OmegaConf.to_container(cfg, resolve=True),
                 },
-                ckpt_path,
+                ckpt_dir / f"{cfg.model.name}_best.pth",
             )
         else:
             patience_counter += 1
+
+        # Always overwrite the last checkpoint so training can be resumed after
+        # a Kaggle session timeout or connection drop.
+        torch.save(
+            {
+                "epoch": epoch,
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "scheduler_state_dict": scheduler.state_dict(),
+                "scaler_state_dict": scaler.state_dict(),
+                "best_dice": best_dice,
+                "patience_counter": patience_counter,
+                "cfg": OmegaConf.to_container(cfg, resolve=True),
+            },
+            ckpt_dir / f"{cfg.model.name}_last.pth",
+        )
 
         if patience_counter >= cfg.training.early_stopping_patience:
             print(f"Early stopping at epoch {epoch}. Best val Dice: {best_dice:.4f}")
