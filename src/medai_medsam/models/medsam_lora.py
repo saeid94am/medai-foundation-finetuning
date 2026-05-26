@@ -32,9 +32,10 @@ class MedSAMLoRA(nn.Module):
 
         if not Path(checkpoint).exists():
             raise FileNotFoundError(
-                f"MedSAM checkpoint not found at '{checkpoint}'. "
-                "Download medsam_vit_b.pth from HuggingFace Hub (wanglab/medsam-vit-base) "
-                "and place it at the path above."
+                f"MedSAM checkpoint not found at '{checkpoint}'.\n"
+                "Download medsam_vit_b.pth from the official MedSAM repository:\n"
+                "  https://github.com/bowang-lab/MedSAM\n"
+                "The README links to the Google Drive folder containing the checkpoint."
             )
 
         # MedSAM is a fine-tuned SAM vit_b — same architecture, different weights
