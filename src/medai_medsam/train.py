@@ -60,7 +60,7 @@ def train_one_epoch(model, loader, optimizer, criterion, scaler, cfg, device, ep
         mask = batch["mask"].to(device)
         bbox = batch["bbox"].to(device)
 
-        with torch.cuda.amp.autocast(enabled=cfg.training.mixed_precision):
+        with torch.amp.autocast("cuda", enabled=cfg.training.mixed_precision):
             logits = model(image, bbox)
             loss = criterion(logits, mask) / cfg.training.accumulate_grad_batches
 
@@ -92,7 +92,7 @@ def validate(model, loader, criterion, metrics, device, cfg):
         mask = batch["mask"].to(device)
         bbox = batch["bbox"].to(device)
 
-        with torch.cuda.amp.autocast(enabled=cfg.training.mixed_precision):
+        with torch.amp.autocast("cuda", enabled=cfg.training.mixed_precision):
             logits = model(image, bbox)
             loss = criterion(logits, mask)
 
@@ -127,7 +127,7 @@ def main(cfg: DictConfig) -> None:
     criterion = build_loss(cfg)
     optimizer = build_optimizer(cfg, model)
     scheduler = build_scheduler(cfg, optimizer)
-    scaler = torch.cuda.amp.GradScaler(enabled=cfg.training.mixed_precision)
+    scaler = torch.amp.GradScaler("cuda", enabled=cfg.training.mixed_precision)
     val_metrics = SegmentationMetrics(device=device)
 
     ckpt_dir = Path(cfg.checkpointing.dirpath)
