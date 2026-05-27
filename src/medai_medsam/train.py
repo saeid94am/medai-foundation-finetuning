@@ -216,7 +216,9 @@ def main(cfg: DictConfig) -> None:
     if best_ckpt_path.exists():
         best_ckpt = torch.load(best_ckpt_path, map_location=device)
         model.load_state_dict(best_ckpt["model_state_dict"])
-        print(f"Loaded best model from epoch {best_ckpt['epoch']} (val Dice: {best_ckpt['val_dice']:.4f})")
+        print(
+            f"Loaded best model from epoch {best_ckpt['epoch']} (val Dice: {best_ckpt['val_dice']:.4f})"
+        )
 
     wandb.finish()
     # Record W&B run URL for reproducibility
