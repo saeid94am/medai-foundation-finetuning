@@ -76,9 +76,7 @@ class DiceBCELoss(nn.Module):
             # Boundary pixels get (1 + boundary_weight)× the BCE loss weight.
             # Gradient flows only through logits; targets is treated as constant.
             weight_map = _boundary_weight_map(targets.detach(), self.boundary_kernel_size)
-            bce_loss = F.binary_cross_entropy_with_logits(
-                logits, targets, weight=weight_map
-            )
+            bce_loss = F.binary_cross_entropy_with_logits(logits, targets, weight=weight_map)
         else:
             bce_loss = F.binary_cross_entropy_with_logits(logits, targets)
 
