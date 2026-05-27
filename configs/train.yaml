@@ -29,7 +29,7 @@ data:
 
 training:
   max_epochs: 100
-  early_stopping_patience: 15
+  early_stopping_patience: 10
   gradient_clip_val: 1.0
   accumulate_grad_batches: 4    # effective batch size = batch_size × accumulate_grad_batches
   mixed_precision: true

@@ -172,7 +172,8 @@ def main(cfg: DictConfig) -> None:
             f"train_loss={train_loss:.4f} | "
             f"val_loss={val_results['loss']:.4f} | "
             f"val_dice={val_results['dice']:.4f} | "
-            f"lr={optimizer.param_groups[0]['lr']:.2e}"
+            f"lr={optimizer.param_groups[0]['lr']:.2e} | "
+            f"patience={patience_counter}/{cfg.training.early_stopping_patience}"
         )
 
         if val_results["dice"] > best_dice:
@@ -210,6 +211,12 @@ def main(cfg: DictConfig) -> None:
         if patience_counter >= cfg.training.early_stopping_patience:
             print(f"Early stopping at epoch {epoch}. Best val Dice: {best_dice:.4f}")
             break
+
+    best_ckpt_path = ckpt_dir / f"{cfg.model.name}_best.pth"
+    if best_ckpt_path.exists():
+        best_ckpt = torch.load(best_ckpt_path, map_location=device)
+        model.load_state_dict(best_ckpt["model_state_dict"])
+        print(f"Loaded best model from epoch {best_ckpt['epoch']} (val Dice: {best_ckpt['val_dice']:.4f})")
 
     wandb.finish()
     # Record W&B run URL for reproducibility
