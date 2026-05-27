@@ -167,6 +167,13 @@ def main(cfg: DictConfig) -> None:
             "lr": optimizer.param_groups[0]["lr"],
         }
         wandb.log(log)
+        print(
+            f"Epoch {epoch:03d}/{cfg.training.max_epochs - 1} | "
+            f"train_loss={train_loss:.4f} | "
+            f"val_loss={val_results['loss']:.4f} | "
+            f"val_dice={val_results['dice']:.4f} | "
+            f"lr={optimizer.param_groups[0]['lr']:.2e}"
+        )
 
         if val_results["dice"] > best_dice:
             best_dice = val_results["dice"]
