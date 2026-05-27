@@ -1,6 +1,6 @@
 import torch
 
-from medai_medsam.losses.dice_bce import DiceBCELoss
+from medai_medsam.losses.dice_bce import DiceBCELoss, _boundary_weight_map
 
 
 def test_loss_is_scalar(random_logits, random_mask):
@@ -49,6 +49,30 @@ def test_build_loss_factory_returns_criterion():
     )
     criterion = build_loss(cfg)
     assert isinstance(criterion, DiceBCELoss)
+
+
+def test_boundary_weight_map_highlights_edges():
+    mask = torch.zeros(1, 1, 32, 32)
+    mask[0, 0, 8:24, 8:24] = 1.0
+    weight_map = _boundary_weight_map(mask, kernel_size=3)
+    # Interior pixels should have weight 1.0, boundary pixels 2.0
+    interior = weight_map[0, 0, 12:20, 12:20]
+    assert interior.max().item() == 1.0
+    assert weight_map.max().item() == 2.0
+
+
+def test_boundary_loss_reduces_hd_sensitive_errors():
+    # A prediction that gets the blob right but shifts the boundary outward
+    # should incur a higher loss with boundary_weight=1 than without.
+    mask = torch.zeros(1, 1, 32, 32)
+    mask[0, 0, 8:24, 8:24] = 1.0
+    shifted = torch.zeros(1, 1, 32, 32)
+    shifted[0, 0, 6:26, 6:26] = 1.0  # 2px dilation — correct interior, wrong boundary
+    logits = (shifted * 10.0) - ((1 - shifted) * 10.0)
+
+    loss_no_boundary = DiceBCELoss(boundary_weight=0.0)(logits, mask)
+    loss_with_boundary = DiceBCELoss(boundary_weight=1.0)(logits, mask)
+    assert loss_with_boundary.item() > loss_no_boundary.item()
 
 
 def test_build_loss_unknown_raises():

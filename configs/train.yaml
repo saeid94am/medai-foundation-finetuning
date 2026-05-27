@@ -53,6 +53,8 @@ loss:
   dice_weight: 0.5
   bce_weight: 0.5
   smooth: 1.0e-5
+  boundary_weight: 1.0        # extra weight on boundary pixels in BCE (0 = disabled)
+  boundary_kernel_size: 5     # morphological kernel size for boundary extraction
 
 checkpointing:
   dirpath: results/checkpoints

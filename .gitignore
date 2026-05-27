@@ -84,3 +84,9 @@ docker/.env
 # MedSAM / SAM weights (large binary files)
 sam_vit_h_4b8939.pth
 medsam_vit_b.pth
+
+#interpretation
+interpret/
+
+#results
+results/
