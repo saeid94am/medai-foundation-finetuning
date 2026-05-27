@@ -60,7 +60,9 @@ class UNet(nn.Module):
 
         self.final = nn.Conv2d(features[0], out_channels, kernel_size=1)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, bbox: torch.Tensor | None = None) -> torch.Tensor:
+        if x.shape[1] == 3:
+            x = x.mean(dim=1, keepdim=True)  # RGB → grayscale for 1-channel UNet
         skip_connections = []
         for enc in self.encoder:
             x = enc(x)

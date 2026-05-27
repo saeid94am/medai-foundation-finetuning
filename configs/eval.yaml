@@ -14,9 +14,7 @@ data:
   bbox_noise_px: 0         # no perturbation at eval time
 
 metrics:
-  - dice                   # primary metric
-  - hd95                   # 95th-percentile Hausdorff distance
-  - iou                    # Intersection over Union
+  names: [dice, hd95, iou]
   per_class: true          # report metrics separately for benign / malignant
 
 output:
