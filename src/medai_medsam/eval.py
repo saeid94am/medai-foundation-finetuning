@@ -146,7 +146,9 @@ def main(cfg: DictConfig) -> None:
     if cfg.output.save_predictions:
         pred_dir = Path(cfg.output.predictions_dir)
         pred_dir.mkdir(parents=True, exist_ok=True)
-        _save_prediction_overlays(samples, pred_dir)
+        n_samples = cfg.output.get("n_overlay_samples", 5)
+        worst_samples = sorted(samples, key=lambda x: x["dice"])[:n_samples]
+        _save_prediction_overlays(worst_samples, pred_dir)
         _save_prediction_grid(
             samples,
             output_dir / "prediction_grid.png",
@@ -157,7 +159,7 @@ def main(cfg: DictConfig) -> None:
 
 
 def _save_prediction_overlays(samples: list, pred_dir: Path) -> None:
-    """Save individual overlay PNGs for every test sample."""
+    """Save individual overlay PNGs for the given samples (worst-Dice cases)."""
     for s in samples:
         pred_rgb = cv2.cvtColor((s["pred"] * 255).astype(np.uint8), cv2.COLOR_GRAY2RGB)
         overlay = cv2.addWeighted(s["image"], 0.7, pred_rgb, 0.3, 0)

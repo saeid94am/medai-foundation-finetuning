@@ -29,6 +29,7 @@ output:
   wandb_run_file: results/metrics/wandb_runs.txt
   n_worst: 6               # worst-Dice cases shown in the grid
   n_best: 6                # best-Dice cases shown in the grid
+  n_overlay_samples: 5     # individual overlay PNGs saved (worst-Dice only)
 
 # Label-efficiency sweep: set to evaluate a checkpoint trained on N% of data
 label_efficiency:
