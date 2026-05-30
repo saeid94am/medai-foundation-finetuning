@@ -13,6 +13,10 @@ data:
   classes: [benign, malignant]
   bbox_noise_px: 0         # no perturbation at eval time
 
+postprocess:
+  threshold: 0.5                 # sigmoid threshold for binary prediction
+  keep_largest_component: true   # discard spurious blobs that inflate HD95
+
 metrics:
   names: [dice, hd95, iou]
   per_class: true          # report metrics separately for benign / malignant
@@ -20,9 +24,11 @@ metrics:
 output:
   dir: results/metrics
   predictions_dir: results/figures/predictions
-  save_predictions: true   # save overlay PNGs for qualitative inspection
+  save_predictions: true   # save overlay PNGs + prediction grid figure
   results_csv: results/metrics/test_results.csv
   wandb_run_file: results/metrics/wandb_runs.txt
+  n_worst: 6               # worst-Dice cases shown in the grid
+  n_best: 6                # best-Dice cases shown in the grid
 
 # Label-efficiency sweep: set to evaluate a checkpoint trained on N% of data
 label_efficiency:
