@@ -179,6 +179,7 @@ def main(cfg: DictConfig) -> None:
         if val_results["dice"] > best_dice:
             best_dice = val_results["dice"]
             patience_counter = 0
+            best_ckpt_path = ckpt_dir / f"{cfg.model.name}_best.pth"
             torch.save(
                 {
                     "epoch": epoch,
@@ -187,13 +188,22 @@ def main(cfg: DictConfig) -> None:
                     "val_dice": best_dice,
                     "cfg": OmegaConf.to_container(cfg, resolve=True),
                 },
-                ckpt_dir / f"{cfg.model.name}_best.pth",
+                best_ckpt_path,
             )
+            # Upload to W&B so the checkpoint survives Kaggle session expiry
+            artifact = wandb.Artifact(
+                name=f"{cfg.model.name}_best",
+                type="model",
+                metadata={"epoch": epoch, "val_dice": best_dice},
+            )
+            artifact.add_file(str(best_ckpt_path))
+            wandb.log_artifact(artifact)
         else:
             patience_counter += 1
 
         # Always overwrite the last checkpoint so training can be resumed after
         # a Kaggle session timeout or connection drop.
+        last_ckpt_path = ckpt_dir / f"{cfg.model.name}_last.pth"
         torch.save(
             {
                 "epoch": epoch,
@@ -205,8 +215,15 @@ def main(cfg: DictConfig) -> None:
                 "patience_counter": patience_counter,
                 "cfg": OmegaConf.to_container(cfg, resolve=True),
             },
-            ckpt_dir / f"{cfg.model.name}_last.pth",
+            last_ckpt_path,
         )
+        last_artifact = wandb.Artifact(
+            name=f"{cfg.model.name}_last",
+            type="model",
+            metadata={"epoch": epoch, "best_dice": best_dice, "patience": patience_counter},
+        )
+        last_artifact.add_file(str(last_ckpt_path))
+        wandb.log_artifact(last_artifact)
 
         if patience_counter >= cfg.training.early_stopping_patience:
             print(f"Early stopping at epoch {epoch}. Best val Dice: {best_dice:.4f}")
