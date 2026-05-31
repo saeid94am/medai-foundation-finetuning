@@ -49,6 +49,33 @@ def _dice_per_sample(pred_np: np.ndarray, gt_np: np.ndarray) -> float:
     return float(2 * intersection + 1e-5) / float(pred_np.sum() + gt_np.sum() + 1e-5)
 
 
+def _iou_per_sample(pred_np: np.ndarray, gt_np: np.ndarray) -> float:
+    intersection = (pred_np * gt_np).sum()
+    union = pred_np.sum() + gt_np.sum() - intersection
+    return float(intersection + 1e-5) / float(union + 1e-5)
+
+
+def _hd95_per_sample(pred_np: np.ndarray, gt_np: np.ndarray) -> float:
+    from scipy.ndimage import distance_transform_edt
+
+    if pred_np.max() == 0 and gt_np.max() == 0:
+        return 0.0
+    if pred_np.max() == 0 or gt_np.max() == 0:
+        return float(max(pred_np.shape))
+
+    pred_border = pred_np ^ cv2.erode(pred_np.astype(np.uint8), np.ones((3, 3), np.uint8)).astype(
+        bool
+    )
+    gt_border = gt_np ^ cv2.erode(gt_np.astype(np.uint8), np.ones((3, 3), np.uint8)).astype(bool)
+
+    dt_gt = distance_transform_edt(~gt_border)
+    dt_pred = distance_transform_edt(~pred_border)
+
+    d1 = dt_gt[pred_border] if pred_border.any() else np.array([0.0])
+    d2 = dt_pred[gt_border] if gt_border.any() else np.array([0.0])
+    return float(np.percentile(np.concatenate([d1, d2]), 95))
+
+
 @hydra.main(config_path="../../configs", config_name="eval", version_base="1.3")
 def main(cfg: DictConfig) -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -116,6 +143,8 @@ def main(cfg: DictConfig) -> None:
                         "gt": gt_np,
                         "pred": pred_np,
                         "dice": _dice_per_sample(pred_np, gt_np),
+                        "iou": _iou_per_sample(pred_np, gt_np),
+                        "hd95": _hd95_per_sample(pred_np, gt_np),
                     }
                 )
 
@@ -131,16 +160,22 @@ def main(cfg: DictConfig) -> None:
             for k, v in r.items():
                 print(f"  {k}: {v:.4f}")
 
-    # Save CSV
+    # Save CSV — one row per test image with per-sample metrics
     results_path = Path(cfg.output.results_csv)
     results_path.parent.mkdir(parents=True, exist_ok=True)
     with open(results_path, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["path", "class", "dice"] + list(overall.keys()))
+        writer = csv.DictWriter(f, fieldnames=["path", "class", "dice", "hd95", "iou"])
         writer.writeheader()
         for s in samples:
-            row = {"path": s["path"], "class": s["class"], "dice": f"{s['dice']:.4f}"}
-            row.update({k: f"{v:.4f}" for k, v in overall.items()})
-            writer.writerow(row)
+            writer.writerow(
+                {
+                    "path": s["path"],
+                    "class": s["class"],
+                    "dice": f"{s['dice']:.4f}",
+                    "hd95": f"{s['hd95']:.4f}",
+                    "iou": f"{s['iou']:.4f}",
+                }
+            )
     print(f"\nResults saved to {results_path}")
 
     if cfg.output.save_predictions:
