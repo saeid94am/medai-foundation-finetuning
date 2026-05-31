@@ -14,8 +14,9 @@ data:
   bbox_noise_px: 0         # no perturbation at eval time
 
 postprocess:
-  threshold: 0.5                 # sigmoid threshold for binary prediction
+  threshold: 0.6                 # sigmoid threshold — higher = more conservative, less over-segmentation
   keep_largest_component: true   # discard spurious blobs that inflate HD95
+  bbox_mask: true                # zero predictions outside the GT bbox prompt (hard geometric constraint)
 
 metrics:
   names: [dice, hd95, iou]

@@ -44,6 +44,29 @@ def keep_largest_component(pred: torch.Tensor) -> torch.Tensor:
     return out
 
 
+def apply_bbox_mask(pred: torch.Tensor, bbox: torch.Tensor) -> torch.Tensor:
+    """Zero out prediction pixels that lie outside the bounding-box prompt.
+
+    Any foreground prediction outside the GT bbox is definitively wrong —
+    the prompt already tells the model the lesion is inside the box.
+    This eliminates the over-segmentation fringe that inflates HD95.
+
+    Args:
+        pred: ``[B, 1, H, W]`` binary prediction tensor.
+        bbox: ``[B, 4]`` boxes in ``[x_min, y_min, x_max, y_max]`` pixel coords.
+
+    Returns:
+        Same shape tensor with predictions outside each bbox zeroed.
+    """
+    out = pred.clone()
+    for b in range(pred.shape[0]):
+        x_min, y_min, x_max, y_max = bbox[b].long().tolist()
+        box_mask = torch.zeros_like(pred[b, 0])
+        box_mask[y_min:y_max, x_min:x_max] = 1
+        out[b, 0] = pred[b, 0] * box_mask
+    return out
+
+
 def _dice_per_sample(pred_np: np.ndarray, gt_np: np.ndarray) -> float:
     intersection = (pred_np * gt_np).sum()
     return float(2 * intersection + 1e-5) / float(pred_np.sum() + gt_np.sum() + 1e-5)
@@ -124,6 +147,8 @@ def main(cfg: DictConfig) -> None:
             preds = (torch.sigmoid(logits) > cfg.postprocess.threshold).long()
             if cfg.postprocess.keep_largest_component:
                 preds = keep_largest_component(preds)
+            if cfg.postprocess.bbox_mask:
+                preds = apply_bbox_mask(preds, bbox)
 
             metrics.update(preds, mask.long())
 
