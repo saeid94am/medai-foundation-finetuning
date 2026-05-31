@@ -63,10 +63,11 @@ def _hd95_per_sample(pred_np: np.ndarray, gt_np: np.ndarray) -> float:
     if pred_np.max() == 0 or gt_np.max() == 0:
         return float(max(pred_np.shape))
 
-    pred_border = pred_np ^ cv2.erode(pred_np.astype(np.uint8), np.ones((3, 3), np.uint8)).astype(
-        bool
-    )
-    gt_border = gt_np ^ cv2.erode(gt_np.astype(np.uint8), np.ones((3, 3), np.uint8)).astype(bool)
+    kernel = np.ones((3, 3), np.uint8)
+    pred_bool = pred_np.astype(bool)
+    gt_bool = gt_np.astype(bool)
+    pred_border = pred_bool ^ cv2.erode(pred_np.astype(np.uint8), kernel).astype(bool)
+    gt_border = gt_bool ^ cv2.erode(gt_np.astype(np.uint8), kernel).astype(bool)
 
     dt_gt = distance_transform_edt(~gt_border)
     dt_pred = distance_transform_edt(~pred_border)
