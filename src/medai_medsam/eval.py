@@ -210,11 +210,18 @@ def main(cfg: DictConfig) -> None:
         n_samples = cfg.output.get("n_overlay_samples", 5)
         worst_samples = sorted(samples, key=lambda x: x["dice"])[:n_samples]
         _save_prediction_overlays(worst_samples, pred_dir)
+        n_worst = cfg.output.get("n_worst", 6)
+        n_best = cfg.output.get("n_best", 6)
+        sorted_samples = sorted(samples, key=lambda x: x["dice"])
         _save_prediction_grid(
-            samples,
-            output_dir / "prediction_grid.png",
-            n_worst=cfg.output.get("n_worst", 6),
-            n_best=cfg.output.get("n_best", 6),
+            sorted_samples[:n_worst],
+            output_dir / "prediction_grid_worst.png",
+            title="Worst predictions (lowest Dice)",
+        )
+        _save_prediction_grid(
+            sorted_samples[-n_best:][::-1],
+            output_dir / "prediction_grid_best.png",
+            title="Best predictions (highest Dice)",
         )
         print(f"Visualisations saved to {output_dir}")
 
@@ -232,87 +239,65 @@ def _save_prediction_overlays(samples: list, pred_dir: Path) -> None:
         )
 
 
-def _save_prediction_grid(
-    samples: list,
-    out_path: Path,
-    n_worst: int = 6,
-    n_best: int = 6,
-) -> None:
-    """Save a matplotlib figure grid: worst-Dice cases on top, best on bottom.
+def _save_prediction_grid(samples: list, out_path: Path, title: str) -> None:
+    """Save a 6-row × 4-column prediction grid for the given samples.
 
-    Each row shows one case: Image | GT contour | Prediction contour | Overlay.
-    This is the figure to include in a portfolio or paper supplementary.
+    Each row: Image | GT contour | Prediction contour | Overlay.
     """
     import matplotlib.patches as mpatches
     import matplotlib.pyplot as plt
 
-    sorted_samples = sorted(samples, key=lambda x: x["dice"])
-    worst = sorted_samples[:n_worst]
-    best = sorted_samples[-n_best:][::-1]
-    groups = [("Worst predictions (lowest Dice)", worst), ("Best predictions (highest Dice)", best)]
-
     cols = 4
     col_titles = ["Ultrasound", "Ground truth", "Prediction", "Overlay"]
-    fig_rows = sum(len(g) for _, g in groups)
+    n = len(samples)
 
-    fig, axes = plt.subplots(
-        fig_rows, cols, figsize=(cols * 3, fig_rows * 3), constrained_layout=True
-    )
-    if fig_rows == 1:
+    fig, axes = plt.subplots(n, cols, figsize=(cols * 3, n * 3), constrained_layout=True)
+    if n == 1:
         axes = axes[np.newaxis, :]
 
-    row_idx = 0
-    for group_title, group in groups:
-        for s in group:
-            img = s["image"]
-            gt_contours, _ = cv2.findContours(
-                s["gt"].astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-            )
-            pred_contours, _ = cv2.findContours(
-                s["pred"].astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-            )
-
-            gt_overlay = img.copy()
-            cv2.drawContours(gt_overlay, gt_contours, -1, (0, 255, 0), 2)
-
-            pred_overlay = img.copy()
-            cv2.drawContours(pred_overlay, pred_contours, -1, (255, 0, 0), 2)
-
-            both_overlay = img.copy()
-            cv2.drawContours(both_overlay, gt_contours, -1, (0, 255, 0), 2)
-            cv2.drawContours(both_overlay, pred_contours, -1, (255, 0, 0), 2)
-
-            panels = [img, gt_overlay, pred_overlay, both_overlay]
-            for col, panel in enumerate(panels):
-                ax = axes[row_idx, col]
-                ax.imshow(panel)
-                ax.axis("off")
-                if col == 0:
-                    ax.set_title(
-                        f"{s['class']}  Dice={s['dice']:.3f}",
-                        fontsize=8,
-                        loc="left",
-                        pad=2,
-                    )
-                elif row_idx == 0:
-                    ax.set_title(col_titles[col], fontsize=8)
-
-            row_idx += 1
-
-    # Group section labels
-    row_idx = 0
-    for group_title, group in groups:
-        axes[row_idx, 0].annotate(
-            group_title,
-            xy=(0, 1),
-            xycoords="axes fraction",
-            fontsize=9,
-            fontweight="bold",
-            color="white",
-            bbox=dict(boxstyle="round,pad=0.2", fc="steelblue", alpha=0.8),
-            va="bottom",
+    for row_idx, s in enumerate(samples):
+        img = s["image"]
+        gt_contours, _ = cv2.findContours(
+            s["gt"].astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
-        row_idx += len(group)
+        pred_contours, _ = cv2.findContours(
+            s["pred"].astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
+
+        gt_overlay = img.copy()
+        cv2.drawContours(gt_overlay, gt_contours, -1, (0, 255, 0), 2)
+
+        pred_overlay = img.copy()
+        cv2.drawContours(pred_overlay, pred_contours, -1, (255, 0, 0), 2)
+
+        both_overlay = img.copy()
+        cv2.drawContours(both_overlay, gt_contours, -1, (0, 255, 0), 2)
+        cv2.drawContours(both_overlay, pred_contours, -1, (255, 0, 0), 2)
+
+        for col, panel in enumerate([img, gt_overlay, pred_overlay, both_overlay]):
+            ax = axes[row_idx, col]
+            ax.imshow(panel)
+            ax.axis("off")
+            if col == 0:
+                ax.set_title(
+                    f"{s['class']}  Dice={s['dice']:.3f}",
+                    fontsize=8,
+                    loc="left",
+                    pad=2,
+                )
+            elif row_idx == 0:
+                ax.set_title(col_titles[col], fontsize=8)
+
+    axes[0, 0].annotate(
+        title,
+        xy=(0, 1),
+        xycoords="axes fraction",
+        fontsize=9,
+        fontweight="bold",
+        color="white",
+        bbox=dict(boxstyle="round,pad=0.2", fc="steelblue", alpha=0.8),
+        va="bottom",
+    )
 
     gt_patch = mpatches.Patch(color=(0, 1, 0), label="Ground truth")
     pred_patch = mpatches.Patch(color=(1, 0, 0), label="Prediction")
