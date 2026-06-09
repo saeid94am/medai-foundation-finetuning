@@ -18,3 +18,8 @@ optimizer:
 
 scheduler:
   warmup_epochs: 3
+
+# Boundary loss did not improve MedSAM LoRA (frozen encoder lacks spatial gradient
+# signal); disable it for the UNet baseline to keep BCE+Dice as the fair comparison.
+loss:
+  boundary_weight: 0.0

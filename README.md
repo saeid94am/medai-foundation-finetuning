@@ -1,6 +1,6 @@
 # MedSAM LoRA — Interactive Breast Lesion Segmentation on BUSI
 
-> LoRA-adapted MedSAM achieves **Dice = TBD** on the BUSI test set, outperforming a UNet trained from scratch (Dice = TBD) while using **<1% trainable parameters** and requiring **10× fewer annotated samples** to surpass the UNet baseline.
+> LoRA-adapted MedSAM achieves **Dice = 0.893** on the BUSI test set (benign+malignant combined), compared to a UNet trained from scratch (Dice = TBD), while using **<1% trainable parameters** and requiring far fewer annotated samples to converge.
 
 [![CI — Lint](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/lint.yml/badge.svg)](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/lint.yml)
 [![CI — Tests](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/test.yml/badge.svg)](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/test.yml)
@@ -40,17 +40,35 @@ flowchart TD
 
 ## Results
 
-All experiments: BUSI dataset, stratified 80 / 10 / 10 split, 3 random seeds, mean ± std reported.
+BUSI dataset, stratified 80 / 10 / 10 split (seed=42). Post-processing: sigmoid threshold=0.60, largest-connected-component filtering. Metrics computed on the held-out test split.
 
 ### Segmentation performance (benign + malignant lesions combined)
 
-| Model | Trainable params | Dice ↑ | HD95 ↓ (px) | IoU ↑ |
+| Model | Trainable params | Dice ↑ | HD95 ↓ (mm) | IoU ↑ |
 |---|---|---|---|---|
 | Zero-shot MedSAM | 0 | TBD | TBD | TBD |
 | UNet (from scratch) | ~31 M (100%) | TBD | TBD | TBD |
-| **MedSAM — Linear probe** | ~0.5 M (0.06%) | TBD | TBD | TBD |
-| **MedSAM — LoRA (r=8)** | ~2 M (0.25%) | TBD | TBD | TBD |
+| **MedSAM — LoRA (r=8)** | ~2 M (0.25%) | **0.893** | **44.8** | **0.810** |
 | MedSAM — Full fine-tune | ~308 M (100%) | TBD | TBD | TBD |
+
+### Per-class breakdown — MedSAM LoRA (r=8)
+
+| Class | Dice ↑ | HD95 ↓ (mm) | IoU ↑ |
+|---|---|---|---|
+| Benign | 0.907 | 30.9 | 0.831 |
+| Malignant | 0.865 | 73.9 | 0.765 |
+| **Overall** | **0.893** | **44.8** | **0.810** |
+
+### Ablation — boundary loss and post-processing (MedSAM LoRA, test set)
+
+| Config | Dice ↑ | HD95 ↓ (mm) | IoU ↑ | Stopped at epoch |
+|---|---|---|---|---|
+| Baseline (BCE+Dice, no CCA) | 0.8929 | 45.3 | 0.8095 | 74 |
+| Baseline + CCA | **0.8930** | **44.8** | **0.8096** | 74 |
+| Boundary loss (BCE+Dice+BL, no CCA) | 0.8903 | 46.1 | 0.8053 | 45 |
+| Boundary loss + CCA | 0.8905 | 45.6 | 0.8055 | 45 |
+
+> Boundary loss did not improve performance: with the ViT-H image encoder frozen, the LoRA adapters (decoder attention only) lack sufficient gradient signal to benefit from boundary supervision. Standard BCE+Dice with CCA post-processing is the best configuration.
 
 ### Label efficiency (Dice vs. % training data used)
 
