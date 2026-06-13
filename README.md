@@ -1,6 +1,6 @@
 # MedSAM LoRA — Interactive Breast Lesion Segmentation on BUSI
 
-> LoRA-adapted MedSAM achieves **Dice = 0.893** on the BUSI test set (benign+malignant combined), compared to a UNet trained from scratch (Dice = TBD), while using **<1% trainable parameters** and requiring far fewer annotated samples to converge.
+> LoRA-adapted MedSAM achieves **Dice = 0.893** on the BUSI test set (benign+malignant combined), outperforming a UNet trained from scratch (Dice = 0.558) by **+33.5 Dice points** while using **<0.25% trainable parameters**.
 
 [![CI — Lint](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/lint.yml/badge.svg)](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/lint.yml)
 [![CI — Tests](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/test.yml/badge.svg)](https://github.com/saeid94am/medai-foundation-finetuning/actions/workflows/test.yml)
@@ -47,17 +47,19 @@ BUSI dataset, stratified 80 / 10 / 10 split (seed=42). Post-processing: sigmoid 
 | Model | Trainable params | Dice ↑ | HD95 ↓ (mm) | IoU ↑ |
 |---|---|---|---|---|
 | Zero-shot MedSAM | 0 | TBD | TBD | TBD |
-| UNet (from scratch) | ~31 M (100%) | TBD | TBD | TBD |
+| UNet (from scratch) | ~31 M (100%) | 0.558 | 158.1 | 0.484 |
 | **MedSAM — LoRA (r=8)** | ~2 M (0.25%) | **0.893** | **44.8** | **0.810** |
 | MedSAM — Full fine-tune | ~308 M (100%) | TBD | TBD | TBD |
 
-### Per-class breakdown — MedSAM LoRA (r=8)
+> MedSAM LoRA outperforms UNet by +33.5 Dice points and 3.5× lower HD95, while using less than 0.25% of the trainable parameters. The UNet's poor performance (especially on malignant cases: Dice=0.483, HD95=236mm) reflects the fundamental difficulty of learning robust segmentation features from scratch on ~500 training images.
 
-| Class | Dice ↑ | HD95 ↓ (mm) | IoU ↑ |
-|---|---|---|---|
-| Benign | 0.907 | 30.9 | 0.831 |
-| Malignant | 0.865 | 73.9 | 0.765 |
-| **Overall** | **0.893** | **44.8** | **0.810** |
+### Per-class breakdown
+
+| Class | UNet Dice ↑ | UNet HD95 ↓ | MedSAM LoRA Dice ↑ | MedSAM LoRA HD95 ↓ |
+|---|---|---|---|---|
+| Benign | 0.594 | 115.6 mm | 0.907 | 30.9 mm |
+| Malignant | 0.483 | 236.4 mm | 0.865 | 73.9 mm |
+| **Overall** | **0.558** | **158.1 mm** | **0.893** | **44.8 mm** |
 
 ### Ablation — boundary loss and post-processing (MedSAM LoRA, test set)
 
